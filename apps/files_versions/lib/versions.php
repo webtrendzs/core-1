@@ -38,7 +38,7 @@ class Storage {
 	public static function getUidAndFilename($filename) {
 		$uid = \OC\Files\Filesystem::getOwner($filename);
 		\OC\Files\Filesystem::initMountPoints($uid);
-		if ( $uid != \OCP\User::getUser() ) {
+		if ( $uid !== \OCP\User::getUser() ) {
 			$info = \OC\Files\Filesystem::getFileInfo($filename);
 			$ownerView = new \OC\Files\View('/'.$uid.'/files');
 			$filename = $ownerView->getPath($info['fileid']);
@@ -81,7 +81,7 @@ class Storage {
 	 * store a new version of a file.
 	 */
 	public static function store($filename) {
-		if(\OCP\Config::getSystemValue('files_versions', Storage::DEFAULTENABLED)=='true') {
+		if(\OCP\Config::getSystemValue('files_versions', Storage::DEFAULTENABLED) === 'true') {
 			
 			// if the file gets streamed we need to remove the .part extension
 			// to get the right target
@@ -198,7 +198,7 @@ class Storage {
 	 */
 	public static function rollback($file, $revision) {
 
-		if(\OCP\Config::getSystemValue('files_versions', Storage::DEFAULTENABLED)=='true') {
+		if(\OCP\Config::getSystemValue('files_versions', Storage::DEFAULTENABLED) === 'true') {
 			list($uid, $filename) = self::getUidAndFilename($file);
 			$users_view = new \OC\Files\View('/'.$uid);
 			$files_view = new \OC\Files\View('/'.\OCP\User::getUser().'/files');
@@ -243,7 +243,7 @@ class Storage {
 	 * @returns array
 	 */
 	public static function getVersions($uid, $filename, $count = 0 ) {
-		if( \OCP\Config::getSystemValue('files_versions', Storage::DEFAULTENABLED)=='true' ) {
+		if( \OCP\Config::getSystemValue('files_versions', Storage::DEFAULTENABLED) === 'true' ) {
 			$versions_fileview = new \OC\Files\View('/' . $uid . '/files_versions');
 			$versionsName = $versions_fileview->getLocalFile($filename).'.v';
 			$escapedVersionName = preg_replace('/(\*|\?|\[)/', '[$1]', $versionsName);
@@ -272,7 +272,7 @@ class Storage {
 				$versions[$key]['size'] = $versions_fileview->filesize($filename.'.v'.$version);
 
 				// if file with modified date exists, flag it in array as currently enabled version
-				( \md5_file( $ma ) == $local_file_md5 ? $versions[$key]['fileMatch'] = 1 : $versions[$key]['fileMatch'] = 0 );
+				( \md5_file( $ma ) === $local_file_md5 ? $versions[$key]['fileMatch'] = 1 : $versions[$key]['fileMatch'] = 0 );
 
 			}
 
@@ -289,7 +289,7 @@ class Storage {
 			$versions = array_reverse( $versions );
 
 			// only show the newest commits
-			if( $count != 0 and ( count( $versions )>$count ) ) {
+			if( $count !== 0 and ( count( $versions )>$count ) ) {
 				$versions = array_slice( $versions, count( $versions ) - $count );
 			}
 
@@ -320,7 +320,7 @@ class Storage {
 	 * @return size of vesions
 	 */
 	private static function calculateSize($uid) {
-		if( \OCP\Config::getSystemValue('files_versions', Storage::DEFAULTENABLED)=='true' ) {
+		if( \OCP\Config::getSystemValue('files_versions', Storage::DEFAULTENABLED) === 'true' ) {
 			$versions_fileview = new \OC\Files\View('/'.$uid.'/files_versions');
 			$versionsRoot = $versions_fileview->getLocalFolder('');
 
@@ -348,7 +348,7 @@ class Storage {
 	 * @return array with contains two arrays 'all' which contains all versions sorted by age and 'by_file' which contains all versions sorted by filename
 	 */
 	private static function getAllVersions($uid) {
-		if( \OCP\Config::getSystemValue('files_versions', Storage::DEFAULTENABLED)=='true' ) {
+		if( \OCP\Config::getSystemValue('files_versions', Storage::DEFAULTENABLED) === 'true' ) {
 			$versions_fileview = new \OC\Files\View('/'.$uid.'/files_versions');
 			$versionsRoot = $versions_fileview->getLocalFolder('');
 
@@ -396,7 +396,7 @@ class Storage {
 	 * @brief Erase a file's versions which exceed the set quota
 	 */
 	private static function expire($filename, $versionsSize = null, $offset = 0) {
-		if(\OCP\Config::getSystemValue('files_versions', Storage::DEFAULTENABLED)=='true') {
+		if(\OCP\Config::getSystemValue('files_versions', Storage::DEFAULTENABLED) === 'true') {
 			list($uid, $filename) = self::getUidAndFilename($filename);
 			$versionsFileview = new \OC\Files\View('/'.$uid.'/files_versions');
 
@@ -439,7 +439,7 @@ class Storage {
 
 			// with the  probability of 0.1% we reduce the number of all versions not only for the current file
 			$random = rand(0, 1000);
-			if ($random == 0) {
+			if ($random === 0) {
 				$allFiles = true;
 			} else {
 				$allFiles = false;
