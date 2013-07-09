@@ -477,7 +477,7 @@ class OC_DB {
 			$result = self::executeAudited('SELECT lastval() AS id');
 			$row = $result->fetchRow();
 			self::raiseExceptionOnError($row, 'fetching row for insertid failed');
-			return $row['id'];
+			return (int)$row['id'];
 		} else if( $type === 'mssql' || $type === 'oci') {
 			if($table !== null) {
 				$prefix = OC_Config::getValue( "dbtableprefix", "oc_" );
@@ -493,7 +493,7 @@ class OC_DB {
 			$result = self::$connection->lastInsertId($table);
 		}
 		self::raiseExceptionOnError($result, 'insertid failed');
-		return $result;
+		return (int)$result;
 	}
 
 	/**
