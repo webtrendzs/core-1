@@ -1053,11 +1053,10 @@ class OC_App{
 	 * @return bool
 	*/
 	public static function appDependsOnCheck($appid) {
-		$query = OC_DB::prepare('SELECT `first`.`appid`, `first`.`configvalue` FROM `*PREFIX*appconfig` `first` '.
-					'INNER JOIN `*PREFIX*appconfig` `second` ON `first`.`appid` = `second`.`appid` '.
-					'WHERE `first`.`configkey` = `depends_on` AND `second`.`configkey` = `enabled` '.
-					'AND `second`.`configvalue` = `yes`');
-		$result = $query->execute();
+		$query = OC_DB::prepare('SELECT `first`.`appid`, `second`.`configvalue` FROM `oc_appconfig` `first`, ' .
+					'`oc_appconfig` `second` WHERE `first`.`appid` = `second`.`appid` AND ' .
+					'`second`.`configkey` = ?');
+		$result = $query->execute(array("depends_on"));
 		if (OC_DB::isError($result)) {
 			throw new DatabaseException($result->getMessage(), $query);
 		}
