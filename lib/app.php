@@ -24,6 +24,9 @@
 class MissingDependencyException extends \Exception {
 }
 
+class OutdatedDependencyException extends \Exception {
+}
+
 class DependingAppsException extends \Exception {
 	private $dependent;
 
@@ -1033,15 +1036,18 @@ class OC_App{
 					$active = true;
 				}
 			}
-			if (!$active or !$version) {
+			if (!$active) {
 				throw new MissingDependencyException($dependency[0]);
+			}
+			if (!$version) {
+				throw new OutdatedDependencyException($dependency[0]);
 			}
 		}
 		return true;
 	}
 
 	/**
-	 * @brief checks if other apps depend on this app
+	 * @brief checks if no other apps depend on this app
 	 * @param string $appid id of the app to check
 	 * @throws DependingAppsException
 	 * @return bool
@@ -1056,6 +1062,7 @@ class OC_App{
 			throw new DatabaseException($result->getMessage(), $query);
 		}
 
+		$alldependencies = array();
 		while ($row = $result->fetchRow()) {
 			$dependencies = json_decode($row['configvalue']);
 			foreach ($dependencies as $dependency) {
