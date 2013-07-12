@@ -1021,21 +1021,22 @@ class OC_App{
 	*/
 	public static function appDependencyCheck($dependencies) {
 		foreach ($dependencies as $dependency) {
-			$query = OC_DB::prepare('SELECT `appid`, `configkey`, `configvalue` FROM `*PREFIX*appconfig` WHERE `appid` = ?');
-			$result = $query->execute(array($dependency[0]));
-			if (OC_DB::isError($result)) {
-				throw new DatabaseException($result->getMessage(), $query);
-			}
+			$values = OC_Appconfig::getValues($dependency[0], false);
 
 			$active = false;
 			$version = false;
-			while ($row = $result->fetchRow()) {
-				if ($row['configkey'] === "installed_version" && version_compare($row['configvalue'], $dependency[1], '>=')) {
-					$version = true;
-				} else if ($row['configkey'] === "enabled" && $row['configvalue'] === "yes") {
-					$active = true;
-				}
+
+			if (empty($values)) {
+				throw new MissingDependencyException($dependency[0]);
 			}
+
+			if (version_compare($values['installed_version'], $dependency[1], '>=')) {
+				$version = true;
+			}
+			if ($values['enabled'] === "yes") {
+				$active = true;
+			}
+
 			if (!$active) {
 				throw new MissingDependencyException($dependency[0]);
 			}
@@ -1053,8 +1054,8 @@ class OC_App{
 	 * @return bool
 	*/
 	public static function appDependsOnCheck($appid) {
-		$query = OC_DB::prepare('SELECT `first`.`appid`, `second`.`configvalue` FROM `oc_appconfig` `first`, ' .
-					'`oc_appconfig` `second` WHERE `first`.`appid` = `second`.`appid` AND ' .
+		$query = OC_DB::prepare('SELECT `first`.`appid`, `second`.`configvalue` FROM `*PREFIX*appconfig` `first`, ' .
+					'`*PREFIX*appconfig` `second` WHERE `first`.`appid` = `second`.`appid` AND ' .
 					'`second`.`configkey` = ?');
 		$result = $query->execute(array("depends_on"));
 		if (OC_DB::isError($result)) {
