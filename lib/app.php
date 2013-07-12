@@ -21,24 +21,6 @@
  *
  */
 
-class MissingDependencyException extends \Exception {
-}
-
-class OutdatedDependencyException extends \Exception {
-}
-
-class DependingAppsException extends \Exception {
-	private $dependent;
-
-	public function __construct($dependent){
-		$this->dependent = $dependent;
-	}
-
-	public function getDependent() {
-		return $this->dependent;
-	}
-}
-
 /**
  * This class manages the apps. It allows them to register and integrate in the
  * owncloud ecosystem. Furthermore, this class is responsible for installing,
@@ -1017,7 +999,7 @@ class OC_App{
 	/**
 	 * @brief checks if app dependencies are fullfilled
 	 * @param array $dependencies array of dependencies including each the dependent appid and version
-	 * @throws MissingDependencyException
+	 * @throws OC\App\MissingDependencyException
 	 * @return bool
 	*/
 	public static function appDependencyCheck($dependencies) {
@@ -1028,7 +1010,7 @@ class OC_App{
 			$version = false;
 
 			if (empty($values)) {
-				throw new MissingDependencyException($dependency[0]);
+				throw new \OC\App\MissingDependencyException($dependency[0]);
 			}
 
 			if (version_compare($values['installed_version'], $dependency[1], '>=')) {
@@ -1039,10 +1021,10 @@ class OC_App{
 			}
 
 			if (!$active) {
-				throw new MissingDependencyException($dependency[0]);
+				throw new \OC\App\MissingDependencyException($dependency[0]);
 			}
 			if (!$version) {
-				throw new OutdatedDependencyException($dependency[0]);
+				throw new \OC\App\OutdatedDependencyException($dependency[0]);
 			}
 		}
 		return true;
@@ -1081,7 +1063,7 @@ class OC_App{
 		if (empty($doesdepend)) {
 			return true;
 		} else {
-			throw new DependingAppsException($doesdepend);
+			throw new \OC\App\DependingAppsException($doesdepend);
 		}
 	}
 }
