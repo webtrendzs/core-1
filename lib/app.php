@@ -258,9 +258,10 @@ class OC_App{
 					.' not compatible with this version of ownCloud',
 					OC_Log::ERROR);
 				throw new \Exception($l->t("App can't be installed because it is not compatible with this version of ownCloud."));
-			} else if (isset($info['dependencies'])) {
-				self::appDependencyCheck($info['dependencies']); // Check if dependencies are installed
 			}else{
+				if (isset($info['dependencies'])) {
+					self::appDependencyCheck($info['dependencies']); // Check if dependencies are installed
+				}
 				OC_Appconfig::setValue( $app, 'enabled', 'yes' );
 				if (isset($info['dependencies'])) { // Save dependencies to check when disabling
 					OC_Appconfig::setValue($app, 'depends_on', json_encode($info['dependencies']));
@@ -1054,7 +1055,7 @@ class OC_App{
 	 * @return bool
 	*/
 	public static function appDependsOnCheck($appid) {
-		$query = OC_DB::prepare('SELECT `first`.`appid`, `second`.`configvalue` FROM `*PREFIX*appconfig` `first`, ' .
+		$query = OC_DB::prepare('SELECT DISTINCT `first`.`appid`, `second`.`configvalue` FROM `*PREFIX*appconfig` `first`, ' .
 					'`*PREFIX*appconfig` `second` WHERE `first`.`appid` = `second`.`appid` AND ' .
 					'`second`.`configkey` = ?');
 		$result = $query->execute(array("depends_on"));
