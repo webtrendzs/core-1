@@ -270,9 +270,10 @@ class OC_App{
 	public static function disable( $app ) {
 		// check if app is a shipped app or not. if not delete
 		\OC_Hook::emit('OC_App', 'pre_disable', array('app' => $app));
-		if (self::appDependsOnCheck($app)) {
-			OC_Appconfig::setValue( $app, 'enabled', 'no' );
-		}
+
+		// Check if other apps depend on this app
+		self::appDependsOnCheck($app);
+		OC_Appconfig::setValue( $app, 'enabled', 'no' );
 
 		// check if app is a shipped app or not. if not delete
 		if(!OC_App::isShipped( $app )) {
@@ -1038,10 +1039,11 @@ class OC_App{
 	 * @return bool
 	*/
 	public static function appDependsOnCheck($appid) {
-		$query = OC_DB::prepare('SELECT DISTINCT `first`.`appid`, `second`.`configvalue` FROM `*PREFIX*appconfig` `first`, ' .
-					'`*PREFIX*appconfig` `second` WHERE `first`.`appid` = `second`.`appid` AND ' .
-					'`second`.`configkey` = ?');
-		$result = $query->execute(array("depends_on"));
+		$query = OC_DB::prepare('SELECT `first`.`appid`, `second`.`configvalue` FROM '.
+					'`*PREFIX*appconfig` `first`, `*PREFIX*appconfig` `second` WHERE '.
+					'`first`.`appid` = `second`.`appid` AND `first`.`configkey` = ? AND '.
+					'`first`.`configvalue` = ? AND `second`.`configkey` = ?');
+		$result = $query->execute(array("enabled", "yes", "depends_on"));
 		if (OC_DB::isError($result)) {
 			throw new DatabaseException($result->getMessage(), $query);
 		}
