@@ -242,10 +242,12 @@ class OC_App{
 				throw new \Exception($l->t("App can't be installed because it is not compatible with this version of ownCloud."));
 			}else{
 				if (isset($info['dependencies'])) {
-					self::appDependencyCheck($info['dependencies']); // Check if dependencies are installed
+					// Check if dependencies are installed
+					self::appDependencyCheck($info['dependencies']);
 				}
 				OC_Appconfig::setValue( $app, 'enabled', 'yes' );
-				if (isset($info['dependencies'])) { // Save dependencies to check when disabling
+				// Save dependencies to check when disabling
+				if (isset($info['dependencies'])) {
 					OC_Appconfig::setValue($app, 'depends_on', json_encode($info['dependencies']));
 				}
 				if(isset($appdata['id'])) {
@@ -268,7 +270,6 @@ class OC_App{
 	public static function disable( $app ) {
 		// check if app is a shipped app or not. if not delete
 		\OC_Hook::emit('OC_App', 'pre_disable', array('app' => $app));
-		$dependson = self::appDependsOnCheck($app);
 		if (self::appDependsOnCheck($app)) {
 			OC_Appconfig::setValue( $app, 'enabled', 'no' );
 		}
