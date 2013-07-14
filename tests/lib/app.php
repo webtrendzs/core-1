@@ -85,7 +85,7 @@ class Test_App extends PHPUnit_Framework_TestCase {
 		OC_Appconfig::setValue('otherapp', 'enabled', 'yes');
 		OC_Appconfig::setValue('otherapp', 'installed_version', '0.3.1');
 		$dependencies = array( array('someapp', '1.3.1'), array('otherapp', '0.2') );
-		$this->assertTrue(OC_App::appDependencyCheck($dependencies));
+		$this->assertNull(OC_App::appDependencyCheck($dependencies));
 	}
 
 	public function testOutdatedDependencyCheck() {
@@ -132,7 +132,7 @@ class Test_App extends PHPUnit_Framework_TestCase {
 		OC_Appconfig::setValue('otherdependentapp', 'depends_on', json_encode(array(array('depencyapp', '0.4'), array('otherdependencyapp', '0.1'))));
 		OC_Appconfig::setValue('dependencyapp', 'enabled', 'yes');
 		OC_Appconfig::setValue('otherdependencyapp', 'enabled', 'yes');
-		$this->assertTrue(OC_App::appDependsOnCheck('otherdependentapp'));
+		$this->assertNull(OC_App::appDependsOnCheck('otherdependentapp'));
 	}
 
 	public function testNegativeDependsOn() {

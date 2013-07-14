@@ -1029,7 +1029,6 @@ class OC_App{
 				throw new \OC\App\OutdatedDependencyException($dependency[0]);
 			}
 		}
-		return true;
 	}
 
 	/**
@@ -1063,9 +1062,7 @@ class OC_App{
 			}
 		}
 
-		if (empty($doesdepend)) {
-			return true;
-		} else {
+		if (!empty($doesdepend)) {
 			throw new \OC\App\DependingAppsException($doesdepend);
 		}
 	}
